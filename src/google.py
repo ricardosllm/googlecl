@@ -50,13 +50,14 @@ import optparse
 import os
 import sys
 import traceback
-import webbrowser
 import googlecl
 import googlecl.authentication
 import googlecl.authenticate
 import googlecl.config
+
 try:  # Fails if Discovery stuff is unavailable
     from googlecl.discovery import DiscoveryManager
+
     apis = True
 except:
     apis = False
@@ -75,7 +76,6 @@ AVAILABLE_APIS = None
 
 
 class NonFatalOptionParser(optparse.OptionParser):
-
     def error(self, message):
         self.error_message = message
 
@@ -87,6 +87,7 @@ class NonFatalOptionParser(optparse.OptionParser):
         if hasattr(self, 'error_message'):
             print self.usage, "\n\n", "FATAL ERROR:\n", self.error_message, "\n"
             exit(1)
+
 
 # Attempts to sanely parse the command line, considering both the legacy gdata
 # services and the new discovery services which aren't known at runtime.
@@ -212,7 +213,8 @@ def expand_as_command_line(command_string):
         # Don't need to worry about nesting because of natural syntax:
         # ["foo", ["bar"], "baz"] -> stupid to have '["bar"] ,'
         while (start_of_quote and not end_quote(tmp)) or (start_of_dict
-                                                          and not end_dict(tmp)) or (start_of_list and not end_list(tmp)):
+                                                          and not end_dict(tmp)) or (
+            start_of_list and not end_list(tmp)):
             if token_list:
                 tmp += ' ' + token_list.pop(0)
             else:
@@ -270,6 +272,7 @@ def fill_out_options(args, service_header, task, options, config):
       Nothing, though options may be modified to hold the required fields.
 
     """
+
     def _retrieve_value(attr, service_header):
         """Retrieve value from config file or user prompt."""
         value = config.lazy_get(service_header, attr)
@@ -295,7 +298,7 @@ def fill_out_options(args, service_header, task, options, config):
         setattr(options, attr, value)
 
     # Expand those options that might be a filename in disguise.
-    max_file_size = 500000    # Value picked arbitrarily - no idea what the max
+    max_file_size = 500000  # Value picked arbitrarily - no idea what the max
     # size in bytes of a summary is.
     if options.summary and os.path.exists(os.path.expanduser(options.summary)):
         with open(options.summary, 'r') as summary_file:
@@ -515,7 +518,7 @@ def run_interactive(parser):
             # Windows will raise a KeyboardInterrupt, GNU/Linux seems to also
             # potentially raise a ValueError about I/O operation.
             if isinstance(err, ValueError) and \
-               str(err).find('I/O operation on closed file') == -1:
+                            str(err).find('I/O operation on closed file') == -1:
                 print "Error: " + str(err)
                 LOG.error(err)
                 raise err
@@ -551,9 +554,9 @@ def run_once(options, args):
     # APIs.
     if apis and not discovery:
         if (args[0] not in AVAILABLE_SERVICES) or \
-           (args[0] == 'help' and len(args) == 1) or \
-           (args[0] == 'help' and len(args) > 1 and
-                args[1] not in AVAILABLE_SERVICES):
+                (args[0] == 'help' and len(args) == 1) or \
+                (args[0] == 'help' and len(args) > 1 and
+                         args[1] not in AVAILABLE_SERVICES):
             # Is there a better approach than using the calendar API to get the email
             # address?
             service_class, tasks, section_header, config = import_service('calendar',
@@ -591,7 +594,7 @@ def run_once(options, args):
 
     # Detects if GData is not provided a version number or the path is too long
     conflict = (task_name[0] == 'v' and task_name[
-                1].isdigit()) or (service == 'help' and args)
+        1].isdigit()) or (service == 'help' and args)
     # Prioritizes using existing GData APIs over Discovery.
     # May have to change if/when those are brought over to Discovery...
     if service == 'help':
@@ -705,11 +708,11 @@ def run_once(options, args):
     # this uses the custom authentication module for oauth2
     auth = googlecl.authenticate.Authenticate(service)
     client = auth.oauth_login()
-    #auth_manager = googlecl.authentication.AuthenticationManager(
+    # auth_manager = googlecl.authentication.AuthenticationManager(
     #    service, client)
-    #authenticated = authenticate(auth_manager, options, config, section_header)
+    # authenticated = authenticate(auth_manager, options, config, section_header)
 
-    #if not authenticated:
+    # if not authenticated:
     #    LOG.debug('Authentication failed, exiting run_once')
     #    return -1
 
@@ -721,8 +724,8 @@ def run_once(options, args):
     run_error = None
 
     try:
-        #webalbums = client.GetUserFeed(user='vinitcool76')
-        #for webalbum in webalbums.entry:
+        # webalbums = client.GetUserFeed(user='vinitcool76')
+        # for webalbum in webalbums.entry:
         #    print webalbum.title.text
         # the crash is because the client implements different tasks than what is expected here.
         #
@@ -817,13 +820,13 @@ def setup_parser(loading_usage):
                       help='Specify access/visibility level of an upload')
     parser.add_option('--blog', dest='blog',
                       help='Blogger only - specify a blog other than your' +
-                      ' primary.')
+                           ' primary.')
     parser.add_option('--cal', dest='cal',
                       help='Calendar only - specify a calendar other than your' +
-                      ' primary.')
+                           ' primary.')
     parser.add_option('-c', '--category', dest='category',
                       help='YouTube only - specify video categories' +
-                      ' as a comma-separated list, e.g. "Film, Travel"')
+                           ' as a comma-separated list, e.g. "Film, Travel"')
     parser.add_option('--commission', dest='commission',
                       help=("Finance only - specify commission for transaction"))
     parser.add_option('--config', dest='config',
@@ -832,7 +835,7 @@ def setup_parser(loading_usage):
                       help=("Finance only - specify currency for portfolio"))
     parser.add_option('--devtags', dest='devtags',
                       help='YouTube only - specify developer tags' +
-                      ' as a comma-separated list.')
+                           ' as a comma-separated list.')
     parser.add_option('--devkey', dest='devkey',
                       help='YouTube only - specify a developer key')
     parser.add_option('-d', '--date', dest='date',
@@ -858,7 +861,7 @@ def setup_parser(loading_usage):
                       help='Fields to list with list task.')
     parser.add_option('-f', '--folder', dest='folder',
                       help='Docs only - specify folder(s) to upload to ' +
-                      '/ search in.')
+                           '/ search in.')
     parser.add_option('--force-auth', dest='force_auth',
                       action='store_true',
                       help='Force validation step for re-used access tokens' +
@@ -872,7 +875,7 @@ def setup_parser(loading_usage):
     parser.add_option('--no-convert', dest='convert',
                       action='store_false', default=True,
                       help='Google Apps Premier only - do not convert the file' +
-                      ' on upload. (Else converts to native Google Docs format)')
+                           ' on upload. (Else converts to native Google Docs format)')
     parser.add_option('--notes', dest='notes',
                       help=("Finance only - specify notes for transaction"))
     parser.add_option('-o', '--owner', dest='owner',
@@ -903,7 +906,7 @@ def setup_parser(loading_usage):
     parser.add_option('-s', '--summary', dest='summary',
                       help=('Description of the upload, ' +
                             'or file containing the description.'))
-    parser.add_option('-t',  '--tags', dest='tags',
+    parser.add_option('-t', '--tags', dest='tags',
                       help='Tags for item, e.g. "Sunsets, Earth Day"')
     parser.add_option('--ticker', dest='ticker',
                       help=("Finance only - specify ticker"))
@@ -952,5 +955,6 @@ def exit_from_int(*args):
 
 if __name__ == '__main__':
     import signal
+
     signal.signal(signal.SIGINT, exit_from_int)
     main()
