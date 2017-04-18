@@ -1,15 +1,16 @@
 import os
-import httplib2
 import threading
 import time
-from gdata.photos.service import PhotosService
-from gdata.docs.service import DocsService
+from datetime import datetime
+
+import httplib2
 from gdata.blogger.service import BloggerService
-from gdata.contacts.service import  ContactsService
 from gdata.calendar.service import CalendarService
+from gdata.contacts.service import ContactsService
+from gdata.docs.service import DocsService
 from gdata.finance.service import FinanceService
+from gdata.photos.service import PhotosService
 from gdata.youtube.service import YouTubeService
-from datetime import timedelta, datetime
 from oauth2client import client
 
 
@@ -25,7 +26,7 @@ class Authenticate(object):
         credentials = storage.get()
         if credentials is None or credentials.invalid:
             flow = client.flow_from_clientsecrets('client_secret.json',
-                                                  scope='https://picasaweb.google.com/data/ https://www.googleapis.com/auth/drive https://docs.google.com/feeds/' ,
+                                                  scope='https://picasaweb.google.com/data/ https://www.googleapis.com/auth/drive https://docs.google.com/feeds/',
                                                   redirect_uri='urn:ietf:wg:oauth:2.0:oob')
 
             auth_uri = flow.step1_get_authorize_url()
@@ -42,7 +43,7 @@ class Authenticate(object):
 
         now = datetime.utcnow()
         expires = credentials.token_expiry
-        expires_seconds = (expires-now).seconds
+        expires_seconds = (expires - now).seconds
         # print ("Expires %s from %s = %s" % (expires,now,expires_seconds) )
         if self.service == 'docs':
             gd_client = DocsService(email='default', additional_headers={
@@ -73,7 +74,7 @@ class Authenticate(object):
                 'Authorization': 'Bearer %s' % credentials.access_token
             })
 
-        d = threading.Thread(name='refresh_creds', target=self.refresh_creds, args=(credentials,expires_seconds - 10) )
+        d = threading.Thread(name='refresh_creds', target=self.refresh_creds, args=(credentials, expires_seconds - 10))
         d.setDaemon(True)
         d.start()
         return gd_client
