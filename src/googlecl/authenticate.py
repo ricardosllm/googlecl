@@ -6,12 +6,21 @@ from gdata.photos.service import PhotosService
 from gdata.docs.service import DocsService
 from gdata.blogger.service import BloggerService
 from gdata.contacts.service import  ContactsService
+from gdata.contacts.client import ContactsClient
 from gdata.calendar.service import CalendarService
 from gdata.finance.service import FinanceService
 from gdata.youtube.service import YouTubeService
 from datetime import timedelta, datetime
 from oauth2client import client
 
+
+class TokenFromOAuth2Creds:
+    def __init__(self, creds):
+        self.creds = creds
+    def modify_request(self, req):
+        if self.creds.access_token_expired or not self.creds.access_token:
+            self.creds.refresh(httplib2.Http())
+            self.creds.apply(req.headers)
 
 class Authenticate(object):
     def __init__(self, service):
@@ -61,9 +70,15 @@ class Authenticate(object):
                 'Authorization': 'Bearer %s' % credentials.access_token
             })
         elif self.service == 'contacts':
-            gd_client = ContactsService(email='default', additional_headers={
-                'Authorization': 'Bearer %s' % credentials.access_token
-            })
+            gd_client = ContactsClient(source='googlecl')
+            gd_client.ssl = True
+            gd_client.http_client.debug = True
+            gd_client.auth_token = TokenFromOAuth2Creds(credentials)
+            import ipdb; ipdb.set_trace()
+            gd_client.GetContacts()
+            # gd_client = ContactsService(email='default', additional_headers={
+            #     'Authorization': 'Bearer %s' % credentials.access_token
+            # })
         elif self.service == 'youtube':
             gd_client = YouTubeService(email='default', additional_headers={
                 'Authorization': 'Bearer %s' % credentials.access_token

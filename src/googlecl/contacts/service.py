@@ -65,6 +65,7 @@ class ContactsServiceCL(gdata.contacts.service.ContactsService,
 
     def get_contacts(self, name):
         """Get all contacts that match a name."""
+        import ipdb; ipdb.set_trace()
         uri = self.GetFeedUri()
         return self.GetEntries(uri, name,
                                converter=gdata.contacts.ContactsFeedFromString)
