@@ -32,7 +32,7 @@ You can either clone the public repository:
 
 .. code-block:: console
 
-    $ git clone git://github.com/vinitkumar/google_cl
+    $ git clone git://github.com/vinitkumar/googlecl
 
 Or download the `tarball`_:
 
